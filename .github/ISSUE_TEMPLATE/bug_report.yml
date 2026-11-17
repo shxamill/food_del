@@ -1,0 +1,45 @@
+name: Bug report
+description: Report a reproducible problem in the API, customer frontend, or admin app.
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: "Search existing issues first. Never include credentials, payment secrets, customer data, or private database records."
+  - type: dropdown
+    id: area
+    attributes:
+      label: Affected area
+      options:
+        - Backend API
+        - Customer frontend
+        - Admin frontend
+        - Integration (MongoDB or Stripe)
+    validations:
+      required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: What happened?
+      description: Include expected and actual behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Runtime and environment
+      description: Node.js version, OS, browser, and app directory.
+    validations:
+      required: false
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Redacted logs or screenshots
+      description: Remove tokens, database URLs, payment data, and customer information.
+    validations:
+      required: false
