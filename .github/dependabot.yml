@@ -1,17 +1,29 @@
 version: 2
 updates:
   - package-ecosystem: npm
-    directory: /backend
+    directories:
+      - /backend
+      - /frontend
+      - /admin
     schedule:
       interval: weekly
     open-pull-requests-limit: 10
-  - package-ecosystem: npm
-    directory: /frontend
+    groups:
+      non-breaking-production:
+        applies-to: version-updates
+        dependency-type: production
+        update-types: ["minor", "patch"]
+      non-breaking-development:
+        applies-to: version-updates
+        dependency-type: development
+        update-types: ["minor", "patch"]
+  - package-ecosystem: github-actions
+    directory: /
     schedule:
       interval: weekly
-    open-pull-requests-limit: 10
-  - package-ecosystem: npm
-    directory: /admin
-    schedule:
-      interval: weekly
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
+    groups:
+      non-breaking-actions:
+        applies-to: version-updates
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
