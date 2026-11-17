@@ -1,5 +1,7 @@
 # Food Delivery App
 
+[![CI](https://github.com/shxamill/food_del/actions/workflows/ci.yml/badge.svg)](https://github.com/shxamill/food_del/actions/workflows/ci.yml) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 A full-stack food-delivery application with a customer-facing website, an admin panel, and an Express API backed by MongoDB. The backend includes Stripe-related payment integration code.
 
 ## Applications
@@ -122,4 +124,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), [CODE_OF_CON
 
 ## License
 
-No repository-level LICENSE file is currently present. The backend package metadata separately lists ISC; confirm and add an explicit repository-level license before granting permission to reuse the whole project.
+This project is licensed under the [MIT License](LICENSE).
