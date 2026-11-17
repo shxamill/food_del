@@ -1,4 +1,20 @@
-node_modules
-.env
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Build output
+dist/
+**/dist/
+coverage/
+
+# Local environment and secrets
+.env*
+!.env.example
+
+# Uploaded files and local user data
+backend/uploads/
+
+# Logs and operating-system files
+*.log
 .DS_Store
-dist
+Thumbs.db
