@@ -85,16 +85,17 @@ The Express server mounts route groups for:
 
 Review the route files under backend/routes/ for the exact supported methods and request shapes.
 
-## Production builds
+## Build status
+
+The frontend and admin source trees are currently incomplete in this repository. The customer app imports modules under frontend/src/Context, frontend/src/pages, and frontend/src/components that are not present in the committed tree. The admin app likewise imports admin/src/pages and admin/src/components, which are not present yet.
+
+As a result, the Vite production builds currently fail. CI installs the dependencies and checks backend syntax, then skips the frontend builds with a warning until those source modules are committed. This is intentional: placeholder components are not generated because that would misrepresent working application features.
+
+Once the missing source modules are added, run:
 
 ~~~bash
-cd frontend
-npm ci
-npm run build
-
-cd ../admin
-npm ci
-npm run build
+npm run build --prefix frontend
+npm run build --prefix admin
 ~~~
 
 The backend currently has no dedicated test or build script. It can be syntax-checked with:
