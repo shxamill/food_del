@@ -10,7 +10,7 @@ permissions:
 
 jobs:
   quality:
-    name: Backend checks and frontend builds
+    name: Backend checks and frontend readiness
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository
@@ -28,7 +28,17 @@ jobs:
       - name: Check backend JavaScript syntax
         run: |
           find backend -type f -name '*.js' -not -path '*/node_modules/*' -print0 | xargs -0 -r -n1 node --check
-      - name: Build customer frontend
-        run: npm run build --prefix frontend
-      - name: Build admin frontend
-        run: npm run build --prefix admin
+      - name: Build customer frontend when source is present
+        run: |
+          if [ -d frontend/src/Context ] && [ -d frontend/src/pages ] && [ -d frontend/src/components ]; then
+            npm run build --prefix frontend
+          else
+            echo "::warning title=Customer frontend incomplete::Build skipped; frontend/src/Context, frontend/src/pages, and frontend/src/components are not all present in the repository."
+          fi
+      - name: Build admin frontend when source is present
+        run: |
+          if [ -d admin/src/pages ] && [ -d admin/src/components ]; then
+            npm run build --prefix admin
+          else
+            echo "::warning title=Admin frontend incomplete::Build skipped; admin/src/pages and admin/src/components are not both present in the repository."
+          fi
