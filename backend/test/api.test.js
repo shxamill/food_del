@@ -139,3 +139,35 @@ describe('orders', () => {
         assert.equal((await orderModel.findById(order._id)).payment, false);
     });
 });
+
+describe('input hardening', () => {
+    test('login refuses a query object instead of an email', async () => {
+        const res = await request(app).post('/api/user/login').send({ email: { $ne: null }, password: 'password123' });
+        assert.equal(res.body.success, false);
+        assert.equal(res.body.token, undefined);
+    });
+
+    test('cart refuses item ids that are not plain food ids', async () => {
+        for (const itemId of [{ $gt: '' }, '__proto__']) {
+            const res = await request(app).post('/api/cart/add').set('token', userToken).send({ itemId });
+            assert.equal(res.body.success, false);
+        }
+    });
+
+    test('verify refuses an order id that is not a string', async () => {
+        const res = await request(app).post('/api/order/verify').send({ orderId: { $ne: null }, success: 'true' });
+        assert.equal(res.body.success, false);
+    });
+});
+
+// Keep this last: it uses up the login rate limit for the rest of the run.
+describe('rate limiting', () => {
+    test('repeated login attempts are rate limited', async () => {
+        let limited = false;
+        for (let i = 0; i < 25 && !limited; i++) {
+            const res = await request(app).post('/api/user/login').send({ email: 'customer@example.com', password: 'wrong-password' });
+            limited = res.status === 429;
+        }
+        assert.ok(limited, 'expected a 429 after too many login attempts');
+    });
+});

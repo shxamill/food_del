@@ -108,6 +108,8 @@ Access rules:
 
 Requests to admin routes without a valid token get 401, and logged-in non-admins get 403. Order prices and totals are recalculated from the menu on the server, and an order is only marked paid after Stripe confirms its checkout session was paid.
 
+The API is rate limited per IP: 300 requests per 15 minutes overall, and 20 per 15 minutes for sign-up and login. Ids, emails and passwords must be plain strings, so request bodies can't pass MongoDB query operators.
+
 ## Build status
 
 The frontend and admin source trees are currently incomplete in this repository. The customer app imports modules under frontend/src/Context, frontend/src/pages, and frontend/src/components that are not present in the committed tree. The admin app likewise imports admin/src/pages and admin/src/components, which are not present yet.

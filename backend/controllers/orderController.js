@@ -28,7 +28,7 @@ const buildOrderItems = async (requestedItems) => {
         if (!Number.isInteger(quantity) || quantity < 1) {
             throw new Error("Invalid quantity");
         }
-        const food = await foodModel.findById(item._id);
+        const food = await foodModel.findById(String(item._id));
         if (!food) {
             throw new Error("Item not found");
         }
@@ -44,7 +44,7 @@ const placeOrder = async (req, res) => {
     try {
         const { items, amount } = await buildOrderItems(req.body.items);
         const newOrder = new orderModel({
-            userId: req.body.userId,
+            userId: String(req.body.userId),
             items,
             amount,
             address: req.body.address,
@@ -83,7 +83,7 @@ const placeOrder = async (req, res) => {
 
         newOrder.stripeSessionId = session.id;
         await newOrder.save();
-        await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
+        await userModel.findByIdAndUpdate(String(req.body.userId), { cartData: {} });
 
         res.json({ success: true, session_url: session.url });
 
@@ -99,14 +99,14 @@ const placeOrderCod = async (req, res) => {
     try {
         const { items, amount } = await buildOrderItems(req.body.items);
         const newOrder = new orderModel({
-            userId: req.body.userId,
+            userId: String(req.body.userId),
             items,
             amount,
             address: req.body.address,
             payment: true,
         })
         await newOrder.save();
-        await userModel.findByIdAndUpdate(req.body.userId, { cartData: {} });
+        await userModel.findByIdAndUpdate(String(req.body.userId), { cartData: {} });
 
         res.json({ success: true, message: "Order Placed" });
 
@@ -130,7 +130,7 @@ const listOrders = async (req, res) => {
 // User Orders for Frontend
 const userOrders = async (req, res) => {
     try {
-        const orders = await orderModel.find({ userId: req.body.userId });
+        const orders = await orderModel.find({ userId: String(req.body.userId) });
         res.json({ success: true, data: orders })
     } catch (error) {
         console.log(error);
@@ -139,8 +139,12 @@ const userOrders = async (req, res) => {
 }
 
 const updateStatus = async (req, res) => {
+    const { orderId, status } = req.body;
+    if (typeof orderId !== "string" || typeof status !== "string") {
+        return res.json({ success: false, message: "Invalid request" })
+    }
     try {
-        await orderModel.findByIdAndUpdate(req.body.orderId, { status: req.body.status });
+        await orderModel.findByIdAndUpdate(orderId, { status });
         res.json({ success: true, message: "Status Updated" })
     } catch (error) {
         res.json({ success: false, message: "Error" })
@@ -152,6 +156,9 @@ const updateStatus = async (req, res) => {
 // an order is only marked paid when Stripe itself says its checkout session was paid.
 const verifyOrder = async (req, res) => {
     const { orderId, success } = req.body;
+    if (typeof orderId !== "string") {
+        return res.json({ success: false, message: "Not Verified" })
+    }
     try {
         const order = await orderModel.findById(orderId);
         if (!order) {

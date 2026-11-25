@@ -17,7 +17,7 @@ const adminAuth = async (req, res, next) => {
     }
 
     try {
-        const user = await userModel.findById(decoded.id).select('role');
+        const user = await userModel.findById(String(decoded.id)).select('role');
         if (!user || user.role !== 'admin') {
             return res.status(403).json({ success: false, message: 'Admin access required' });
         }

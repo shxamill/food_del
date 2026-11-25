@@ -11,6 +11,10 @@ const createToken = (id) => {
 //login user
 const loginUser = async (req,res) => {
     const {email, password} = req.body;
+    // Only plain strings reach the query, so a body like {"email": {"$ne": null}} can't match an arbitrary user
+    if (typeof email !== "string" || typeof password !== "string") {
+        return res.json({success:false,message: "Invalid credentials"})
+    }
     try{
         const user = await userModel.findOne({email})
 
@@ -35,6 +39,9 @@ const loginUser = async (req,res) => {
 //register user
 const registerUser = async (req,res) => {
     const {name, email, password} = req.body;
+    if (typeof name !== "string" || typeof email !== "string" || typeof password !== "string") {
+        return res.json({success:false,message: "Please fill in all fields"})
+    }
     try{
         //check if user already exists
         const exists = await userModel.findOne({email})
