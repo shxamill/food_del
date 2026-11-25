@@ -28,6 +28,8 @@ jobs:
       - name: Check backend JavaScript syntax
         run: |
           find backend -type f -name '*.js' -not -path '*/node_modules/*' -print0 | xargs -0 -r -n1 node --check
+      - name: Run backend API tests
+        run: npm test --prefix backend
       - name: Build customer frontend when source is present
         run: |
           if [ -d frontend/src/Context ] && [ -d frontend/src/pages ] && [ -d frontend/src/components ]; then
