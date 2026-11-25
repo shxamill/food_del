@@ -42,6 +42,7 @@ Set the values in backend/.env:
 | MONGO_URI | MongoDB connection string |
 | JWT_SECRET | Secret used to sign authentication tokens |
 | STRIPE_SECRET_KEY | Server-side Stripe secret key |
+| FRONTEND_URL | Optional. Customer site URL that Stripe redirects back to (defaults to http://localhost:5173) |
 
 Start the API:
 
@@ -50,6 +51,16 @@ npm run server
 ~~~
 
 The backend defaults to http://localhost:4000. Its root route responds with "API Working".
+
+#### Admin accounts
+
+Managing the menu and orders needs an admin account. Register a normal account first, then promote it:
+
+~~~bash
+npm run make-admin -- you@example.com
+~~~
+
+Log in with that account and send the returned token in the token header. The login response also includes the account's role.
 
 ### 2. Customer frontend
 
@@ -87,6 +98,16 @@ The Express server mounts route groups for:
 
 Review the route files under backend/routes/ for the exact supported methods and request shapes.
 
+Access rules:
+
+| Access | Routes |
+| --- | --- |
+| Public | POST /api/user/register, POST /api/user/login, GET /api/food/list, POST /api/order/verify |
+| Logged-in customer (token header) | /api/cart/*, POST /api/order/place, POST /api/order/placecod, POST /api/order/userorders |
+| Admin only (token header, admin role) | POST /api/food/add, POST /api/food/remove, GET /api/order/list, POST /api/order/status |
+
+Requests to admin routes without a valid token get 401, and logged-in non-admins get 403. Order prices and totals are recalculated from the menu on the server, and an order is only marked paid after Stripe confirms its checkout session was paid.
+
 ## Build status
 
 The frontend and admin source trees are currently incomplete in this repository. The customer app imports modules under frontend/src/Context, frontend/src/pages, and frontend/src/components that are not present in the committed tree. The admin app likewise imports admin/src/pages and admin/src/components, which are not present yet.
@@ -100,10 +121,10 @@ npm run build --prefix frontend
 npm run build --prefix admin
 ~~~
 
-The backend currently has no dedicated test or build script. It can be syntax-checked with:
+The backend has an API test suite. It starts a temporary in-memory MongoDB, so no database or Stripe key is needed:
 
 ~~~bash
-node --check backend/server.js
+npm test --prefix backend
 ~~~
 
 ## Security notes
